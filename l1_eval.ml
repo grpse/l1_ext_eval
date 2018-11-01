@@ -1,8 +1,6 @@
 type variable = string
 
 (* Outros operadores binário e unários podem ser adicionados a linguagem *) 
-
-
 type bop = 
         Sum   (* + *)
     |   Sub   (* - *)
@@ -43,10 +41,18 @@ type expr =
 (* Implementacao da funcao STEP de avaliacao em um passo *)
 let rec step t = match t with
     (* CASO IF ( t1 , t2 , t3 ) *)
-        If (TmTrue, t2, t3 ) −> t2 (* regra E−IfTrue *)
-    |   If (TmFalse, t2, t3 ) −> t3 (* regra E−False *)
+        If (TmTrue, t2, t3) −> t2 (* regra E−IfTrue *)
+    |   If (TmFalse, t2, t3) −> t3 (* regra E−False *)
     |   If (t1, t2, t3) −> (* regra E−If *)
+    
         let t1' = step t1 in
-            If ( t1', t2 , t3 )
+            If (t1', t2, t3) -> 
             (* CASO SUCC ( t1 ) *)
             
+            
+(* Implementacao de EVAL *)
+let rec eval t =
+    try let t' = step t
+        in eval t'
+    with NoRuleApplies −> t
+    
