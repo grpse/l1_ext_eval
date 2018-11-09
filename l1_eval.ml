@@ -74,6 +74,7 @@ let rec eval envi e =
     match e with
     |   Ncte(n) -> Vnum(n)
     |   Bcte(b) -> Vbool(b)
+    |   Nil -> Vnil
     |   Var(name) -> findValueInEnv envi name
     |   If(boolExpression, e1, e2) -> 
         (
@@ -123,11 +124,18 @@ let rec eval envi e =
             let varValue = eval envi e1 in 
                 eval ((varName, varValue)::envi) e2
         )
-    |   Nil -> Vnil
     |   Cons(valueType, consTail) -> 
         (
             let v = eval envi valueType in
                 Vcons(v, (eval envi consTail))
+        )
+    |   App(e1, e2) ->
+        (
+            let v1 = eval envi e1 in
+            let v2 = eval envi e2 in
+            match v1 with
+            |   Vclos(x, e, envi') -> eval ((x, v2)::envi') e
+            |   _ -> raise NoRuleApplies
         )
     |   Raise -> RRaise
     | _ -> raise NoRuleApplies;;
@@ -145,7 +153,6 @@ let rec printEnvironment envi =
                     | h2::t2 -> Printf.printf ", "; printEnvironment t;
                     | _ -> ()
                 )
-            | _ -> raise ExecutionError
         )
     |   _ -> ()
 
@@ -186,6 +193,10 @@ let test08 = If(Bcte(true), Ncte(0), Ncte(99))
 let test09 = If(Bcte(false), Ncte(0), Ncte(99))
 let test10 = If(Binop(Eq, Ncte(10), Ncte(10)), Ncte(10), Ncte(20))
 let test11 = If(Binop(Df, Ncte(10), Ncte(10)), Ncte(10), Ncte(20))
+let test12 = Let("x", Ncte(10), Binop(Sum, Var("x"), Var("x"))) (* let x = 10 in x + x *)
+let test13 = App(Lam("x", Var("x")), Ncte(10)) (* "identity" (fn x => x)(10) *)
+let test14 = App(Lam("x", Binop(Sum, Var("x"), Ncte(10))), Ncte(10)) (* (fn x => x + 10)(10) *)
+let test15 = Let("sum_10", Lam("x", Binop(Sum, Var("x"), Ncte(10))), App(Var("sum_10"), Ncte(10))) (* let sum_10 = fn x => x + 10 in sum_10(10) *)
 
 let v00 = eval [] test00;;
 let v01 = eval [] test01;;
@@ -199,6 +210,10 @@ let v08 = eval [] test08;;
 let v09 = eval [] test09;;
 let v10 = eval [] test10;;
 let v11 = eval [] test11;;
+let v12 = eval [] test12;;
+let v13 = eval [] test13;;
+let v14 = eval [] test14;;
+let v15 = eval [] test15;;
 
 printEval v00;;
 printEval v01;;
@@ -212,3 +227,7 @@ printEval v08;;
 printEval v09;;
 printEval v10;;
 printEval v11;;
+printEval v12;;
+printEval v13;;
+printEval v14;;
+printEval v15;;
