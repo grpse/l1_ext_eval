@@ -53,6 +53,7 @@ and
 exception NoRuleApplies;;
 exception ExecutionError;;
 exception NoValueFound;;
+exception NoValidValue;;
 exception NoValidOperation;;
 
 let rec findValueInEnv envi varName = 
@@ -71,9 +72,17 @@ let rec findValueInEnv envi varName =
 (* BIG STEP L1 *)
 let rec eval envi e = 
     match e with
-        Ncte(n) -> Vnum(n)
+    |   Ncte(n) -> Vnum(n)
     |   Bcte(b) -> Vbool(b)
     |   Var(name) -> findValueInEnv envi name
+    |   If(boolExpression, e1, e2) -> 
+        (
+            let boolValue = eval envi boolExpression in
+            match boolValue with
+            |   Vbool(true) -> eval envi e1
+            |   Vbool(false) -> eval envi e2
+            |   _ -> raise NoValidValue
+        )
     |   Pair(e1, e2) -> 
         (
             let v1 = eval envi e1 in
@@ -172,6 +181,11 @@ let test03 = Binop(Eq, Ncte(10), Ncte(10))
 let test04 = Cons(Ncte(10), Cons(Ncte(9), Cons(Ncte(8), Nil)))
 let test05 = Lam("x", Ncte(10))
 let test06 = Pair(Var("x"), Ncte(10))
+let test07 = Var("x")
+let test08 = If(Bcte(true), Ncte(0), Ncte(99))
+let test09 = If(Bcte(false), Ncte(0), Ncte(99))
+let test10 = If(Binop(Eq, Ncte(10), Ncte(10)), Ncte(10), Ncte(20))
+let test11 = If(Binop(Df, Ncte(10), Ncte(10)), Ncte(10), Ncte(20))
 
 let v00 = eval [] test00;;
 let v01 = eval [] test01;;
@@ -180,6 +194,11 @@ let v03 = eval [] test03;;
 let v04 = eval [] test04;;
 let v05 = eval [("x", Vnum(10)); ("y", Vbool(false))] test05;;
 let v06 = eval [("x", Vnum(10))] test06;;
+let v07 = eval [("x", Vnum(10))] test07;;
+let v08 = eval [] test08;;
+let v09 = eval [] test09;;
+let v10 = eval [] test10;;
+let v11 = eval [] test11;;
 
 printEval v00;;
 printEval v01;;
@@ -188,3 +207,8 @@ printEval v03;;
 printEval v04;;
 printEval v05;;
 printEval v06;;
+printEval v07;;
+printEval v08;;
+printEval v09;;
+printEval v10;;
+printEval v11;;
