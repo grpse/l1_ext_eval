@@ -117,7 +117,7 @@ let rec eval envi e =
                     |   (Ge, Vnum(n1), Vnum(n2)) -> Vbool(n1 >= n2)
                     |   _ -> raise NoValidOperation
         )
-    |   Lam(varName, e) -> Vclos(varName, e, (varName, eval envi e)::envi)
+    |   Lam(varName, e) -> Vclos(varName, e, envi)
     |   Let(varName, e1, e2) -> 
         (
             let varValue = eval envi e1 in 
