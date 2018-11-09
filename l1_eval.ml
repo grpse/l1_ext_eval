@@ -51,36 +51,112 @@ and
 
 (* Excecao a ser ativada quando termo for uma FORMA NORMAL *)
 exception NoRuleApplies;;
+exception ExecutionError;;
+exception NoValueFound;;
+exception NoValidOperation;;
+
+let rec findValueInEnv envi varName = 
+    match envi with
+    | envHead::envTail -> 
+        (
+            match envHead with 
+            | (envVarName, envVarValue) -> 
+                if envVarName = varName
+                    then envVarValue 
+                else 
+                    findValueInEnv envTail varName
+        )
+    | [] -> raise NoValueFound;;
 
 (* BIG STEP L1 *)
 let rec eval envi e = 
     match e with
         Ncte(n) -> Vnum(n)
     |   Bcte(b) -> Vbool(b)
-    |   Binop(op, e1, e2) -> (
-                                let v1 = eval envi e1 in
-                                let v2 = eval envi e2 in
-                                    match (op, v1, v2) with 
-                                        |   (Sum, Vnum(n1), Vnum(n2)) -> Vnum(n1 + n2)
-                                        |   (Sub, Vnum(n1), Vnum(n2)) -> Vnum(n1 - n2)
-                                        |   _ -> raise NoRuleApplies
-                            )
-    |   Let(name, e1, e2) -> (
-                                let v = eval envi e1 
-                                    in eval ((name, v)::envi) e2
-                            )
+    |   Var(name) -> findValueInEnv envi name
+    |   Pair(e1, e2) -> 
+        (
+            let v1 = eval envi e1 in
+            let v2 = eval envi e2 in
+                Vpair(v1, v2)
+        )
+    |   Unop(op, e) -> 
+        (
+            let v = eval envi e in
+                match (op, v) with
+                | (Not, Vbool(b)) -> Vbool(not b)
+                | _ -> raise NoValidOperation
+        )
+    |   Binop(op, e1, e2) -> 
+        (
+            let v1 = eval envi e1 in
+            let v2 = eval envi e2 in
+                match (op, v1, v2) with 
+                    |   (Sum, Vnum(n1), Vnum(n2)) -> Vnum(n1 + n2)
+                    |   (Sub, Vnum(n1), Vnum(n2)) -> Vnum(n1 - n2)
+                    |   (Mult, Vnum(n1), Vnum(n2)) -> Vnum(n1 * n2)
+                    |   (Div, Vnum(n1), Vnum(n2)) -> Vnum(n1 / n2)
+                    |   (And, Vbool(b1), Vbool(b2)) -> Vbool(b1 && b2)
+                    |   (Or, Vbool(b1), Vbool(b2)) -> Vbool(b1 || b2)
+                    |   (Eq, Vbool(b1), Vbool(b2)) -> Vbool(b1 == b2)
+                    |   (Eq, Vnum(n1), Vnum(n2)) -> Vbool(n1 == n2)
+                    |   (Df, Vnum(n1), Vnum(n2)) -> Vbool(n1 != n2)
+                    |   (Df, Vbool(b1), Vbool(b2)) -> Vbool(b1 != b2)
+                    |   (Lt, Vnum(n1), Vnum(n2)) -> Vbool(n1 < n2)
+                    |   (Le, Vnum(n1), Vnum(n2)) -> Vbool(n1 <= n2)
+                    |   (Gt, Vnum(n1), Vnum(n2)) -> Vbool(n1 > n2)
+                    |   (Ge, Vnum(n1), Vnum(n2)) -> Vbool(n1 >= n2)
+                    |   _ -> raise NoValidOperation
+        )
+    |   Lam(varName, e) -> Vclos(varName, e, envi)
+    |   Let(varName, e1, e2) -> 
+        (
+            let varValue = eval envi e1 in 
+                eval ((varName, varValue)::envi) e2
+        )
     |   Nil -> Vnil
-    | Raise -> RRaise
+    |   Cons(valueType, consTail) -> 
+        (
+            let v = eval envi valueType in
+                Vcons(v, (eval envi consTail))
+        )
+    |   Raise -> RRaise
     | _ -> raise NoRuleApplies;;
             
 (* PRINT FINAL VALUE *)
-let rec printEvalRec v = 
+let rec printEnvironment envi = 
+    match envi with
+    |   h::t -> 
+        (
+            match h with 
+            |   (name, value) -> 
+                (
+                    Printf.printf "(%s, " name; printEvalRec value; Printf.printf ")"; 
+                    match t with 
+                    | h2::t2 -> Printf.printf ", "; printEnvironment t;
+                    | _ -> ()
+                )
+            | _ -> raise ExecutionError
+        )
+    |   _ -> ()
+
+and printEvalRec v = 
     match v with
-    | Vnum(n)    -> Printf.printf "%d " n
-    | Vbool(b)   -> Printf.printf "%B " b
-    | Vnil       -> Printf.printf "NIL "
-    | Vcons(h, t) -> Printf.printf "List: "; printEvalRec h; printEvalRec t
-    | _ -> ();;
+    |   Vnum(n)    -> Printf.printf "%d" n
+    |   Vbool(b)   -> Printf.printf "%B" b
+    |   Vnil       -> Printf.printf "NIL"
+    |   Vcons(h, t) -> printEvalRec h; Printf.printf " -> "; printEvalRec t
+    |   Vclos(varName, e, envi) -> 
+            Printf.printf "<%s, " varName; 
+            printEvalRec (eval envi e); 
+            Printf.printf ", ["; 
+            printEnvironment envi; 
+            Printf.printf "]>" 
+    |   Vpair(f, s) -> 
+            Printf.printf "("; printEvalRec f; Printf.printf ", "; printEvalRec s; Printf.printf ")"
+    |   _ -> ();;
+
+
 
 let printEval v = 
     Printf.printf "Value: ";
@@ -88,14 +164,27 @@ let printEval v =
     Printf.printf "\n";;
 
 (* Tests *)
-let test0 = Bcte(true)
-let test1 = Ncte(10)
-let test2 = Binop(Sum, Ncte(10), Ncte(5))
 
-let v00 = eval [] test0;;
-let v01 = eval [] test1;;
-let v02 = eval [] test2;;
+let test00 = Bcte(true)
+let test01 = Ncte(10)
+let test02 = Binop(Sum, Ncte(10), Ncte(5))
+let test03 = Binop(Eq, Ncte(10), Ncte(10))
+let test04 = Cons(Ncte(10), Cons(Ncte(9), Cons(Ncte(8), Nil)))
+let test05 = Lam("x", Ncte(10))
+let test06 = Pair(Var("x"), Ncte(10))
+
+let v00 = eval [] test00;;
+let v01 = eval [] test01;;
+let v02 = eval [] test02;;
+let v03 = eval [] test03;;
+let v04 = eval [] test04;;
+let v05 = eval [("x", Vnum(10)); ("y", Vbool(false))] test05;;
+let v06 = eval [("x", Vnum(10))] test06;;
 
 printEval v00;;
 printEval v01;;
 printEval v02;;
+printEval v03;;
+printEval v04;;
+printEval v05;;
+printEval v06;;
