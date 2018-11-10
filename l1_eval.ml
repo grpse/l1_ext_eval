@@ -23,6 +23,8 @@ type expr =
     |   Binop of bop * expr * expr
     |   Unop of uop * expr
     |   Pair of expr * expr  
+    |   First of expr
+    |   Second of expr
     |   If of expr * expr * expr 
     |   Var of variable 
     |   App of expr * expr      (* "apply" e1(e2) *)
@@ -91,6 +93,22 @@ let rec eval envi e =
             let v1 = eval envi e1 in
             let v2 = eval envi e2 in
                 Vpair(v1, v2)
+        )
+    |   First(e) ->
+        (
+            let v = eval envi e in
+            match v with
+            |   Vpair(f, _) -> f
+            |   Vnil -> RRaise
+            |   _ -> raise ExecutionError
+        )
+    |   Second(e) ->
+        (
+            let v = eval envi e in
+            match v with
+            |   Vpair(_, s) -> s
+            |   Vnil -> RRaise
+            |   _ -> raise ExecutionError
         )
     |   Unop(op, e) -> 
         (
@@ -219,8 +237,11 @@ let printEval v =
     printEvalRec v;
     Printf.printf "\n";;
 
-(* Tests *)
+let printEvalWithLabel label v =
+    Printf.printf "%s => " (String.uppercase label);
+    printEval v;;
 
+(* Tests *)
 let test00 = Bcte(true)
 let test01 = Ncte(10)
 let test02 = Binop(Sum, Ncte(10), Ncte(5))
@@ -238,7 +259,7 @@ let test13 = App(Lam("x", Var("x")), Ncte(10)) (* "identity" (fn x => x)(10) *)
 let test14 = App(Lam("x", Binop(Sum, Var("x"), Ncte(10))), Ncte(10)) (* (fn x => x + 10)(10) *)
 let test15 = Let("sum_10", Lam("x", Binop(Sum, Var("x"), Ncte(10))), App(Var("sum_10"), Ncte(10))) (* let sum_10 = fn x => x + 10 in sum_10(10) *)
 let test16 = Lrec("fat", "x", If(Binop(Le, Var("x"), Ncte(0)), Ncte(1), Binop(Mult, Var("x"), App(Var("fat"), Binop(Sub, Var("x"), Ncte(1))))), App(Var("fat"), Ncte(5))) 
-                    (* let rec fat = fn x => if x = 0 then 1 else x * fat(x - 1) in fat(5) *)
+                    (* let rec fat x = if x = 0 then 1 else x * fat(x - 1) in fat(5) *)
 
 let test17 = Lrec("sumdown", "x",
                     If(Binop(Eq, Var("x"), Ncte(0)), Ncte(0), Binop(Sum, Var("x"),   App(Var("sumdown"),   Binop(Sub, Var("x"), Ncte(1))  )      ) ),
@@ -256,6 +277,13 @@ let test25 = Tl( Cons(Ncte(1), Nil) ) (* Tl [1] *)
 let test26 = Tl( Nil ) (* Tl Nil *)
 let test27 = Try( Ncte(10), Nil) (* "BAD TYPE" try 10 with Nil *)
 let test28 = Try( Tl(Nil), Cons(Ncte(10), Nil) ) (* "this will raise a condition" try Tl [] with [10] >>>>>>>>>>>>> WELL TYPED <<<<<<<<<<< *)
+let test29 = Lrec("fat", "x", If(Binop(Le, Var("x"), Ncte(0)), Ncte(1), Binop(Mult, Var("x"), App(Var("fat"), Binop(Sub, Var("x"), Ncte(1))))), App(Var("fat"), Var("y")))
+(*  
+    environment [(y -> 5)]
+    let rec fat x = if x = 0 then 1 else x * fat(x - 1) in fat y 
+*)
+let test30 = First(Pair(Ncte(10), Bcte(false)))
+let test31 = Second(Pair(Ncte(10), Bcte(false)))
 
 let v00 = eval [] test00;;
 let v01 = eval [] test01;;
@@ -286,6 +314,9 @@ let v25 = eval [] test25;;
 let v26 = eval [] test26;;
 let v27 = eval [] test27;;
 let v28 = eval [] test28;;
+let v29 = eval [("y", Vnum(5))] test29;;
+let v30 = eval [] test30;;
+let v31 = eval [] test31;;
 
 printEval v00;;
 printEval v01;;
@@ -316,3 +347,6 @@ printEval v25;;
 printEval v26;;
 printEval v27;;
 printEval v28;;
+printEvalWithLabel "fatorial access y from environment" v29;;
+printEvalWithLabel "first from (10, false)" v30;;
+printEvalWithLabel "second from (10, false)" v31;;
