@@ -165,6 +165,13 @@ let rec eval envi e =
             |   Vnil -> RRaise
             |   _ -> raise NoValidList
         )
+    |   Try(e1, e2) ->
+        (
+            let v1 = eval envi e1 in
+            match v1 with
+            |   RRaise -> eval envi e2
+            |   _ -> v1
+        )
     |   Raise -> RRaise
     | _ -> raise NoRuleApplies;;
             
@@ -189,7 +196,7 @@ and printEvalRec v =
     |   Vnum(n)    -> Printf.printf "%d" n
     |   Vbool(b)   -> Printf.printf "%B" b
     |   Vnil       -> Printf.printf "NIL"
-    |   Vcons(h, t) -> printEvalRec h; Printf.printf " -> "; printEvalRec t
+    |   Vcons(h, t) -> printEvalRec h; Printf.printf " :: "; printEvalRec t
     |   Vclos(varName, e, envi) -> 
             Printf.printf "<%s, " varName; 
             printEvalRec (eval envi e); 
@@ -249,6 +256,8 @@ let test23 = Hd( Nil ) (* Hd Nil *)
 let test24 = Tl( Cons(Ncte(1), Cons(Ncte(2), Nil)) ) (* Tl [1; 2] *)
 let test25 = Tl( Cons(Ncte(1), Nil) ) (* Tl [1] *)
 let test26 = Tl( Nil ) (* Tl Nil *)
+let test27 = Try( Ncte(10), Nil) (* "BAD TYPE" try 10 with Nil *)
+let test28 = Try( Tl(Nil), Cons(Ncte(10), Nil) ) (* "this will raise a condition" try Tl [] with [10] >>>>>>>>>>>>> WELL TYPED <<<<<<<<<<< *)
 
 let v00 = eval [] test00;;
 let v01 = eval [] test01;;
@@ -277,6 +286,8 @@ let v23 = eval [] test23;;
 let v24 = eval [] test24;;
 let v25 = eval [] test25;;
 let v26 = eval [] test26;;
+let v27 = eval [] test27;;
+let v28 = eval [] test28;;
 
 printEval v00;;
 printEval v01;;
@@ -305,3 +316,5 @@ printEval v23;;
 printEval v24;;
 printEval v25;;
 printEval v26;;
+printEval v27;;
+printEval v28;;
