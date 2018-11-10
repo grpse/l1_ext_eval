@@ -60,6 +60,7 @@ let rec findValueInEnv envi varName =
     match envi with
     | envHead::envTail -> 
         (
+
             match envHead with 
             | (envVarName, envVarValue) -> 
                 if envVarName = varName
@@ -116,6 +117,7 @@ let rec eval envi e =
                     |   (Le, Vnum(n1), Vnum(n2)) -> Vbool(n1 <= n2)
                     |   (Gt, Vnum(n1), Vnum(n2)) -> Vbool(n1 > n2)
                     |   (Ge, Vnum(n1), Vnum(n2)) -> Vbool(n1 >= n2)
+                    (*|   (_, _, _) -> Vbool(false) *)
                     |   _ -> raise NoValidOperation
         )
     |   Lam(varName, e) -> Vclos(varName, e, envi)
@@ -124,6 +126,7 @@ let rec eval envi e =
             let varValue = eval envi e1 in 
                 eval ((varName, varValue)::envi) e2
         )
+    |   Lrec(f, x, e1, e2) -> eval ((f, Vrclos(f, x, e1, envi))::envi) e2
     |   Cons(valueType, consTail) -> 
         (
             let v = eval envi valueType in
@@ -131,10 +134,11 @@ let rec eval envi e =
         )
     |   App(e1, e2) ->
         (
-            let v1 = eval envi e1 in
-            let v2 = eval envi e2 in
-            match v1 with
-            |   Vclos(x, e, envi') -> eval ((x, v2)::envi') e
+            let closure = eval envi e1 in
+            let v' = eval envi e2 in
+            match closure with
+            |   Vclos(x, e, envi') -> eval ((x, v')::envi') e
+            |   Vrclos(f, x, e, envi') -> eval ((x, v')::(f, closure)::envi') e
             |   _ -> raise NoRuleApplies
         )
     |   Raise -> RRaise
@@ -168,6 +172,12 @@ and printEvalRec v =
             Printf.printf ", ["; 
             printEnvironment envi; 
             Printf.printf "]>" 
+    |   Vrclos(f, x, e, envi) -> 
+            Printf.printf "{ %s -> <%s, %s" f f x; 
+            printEvalRec (eval envi e); 
+            Printf.printf ", ["; 
+            printEnvironment envi; 
+            Printf.printf "]> }" 
     |   Vpair(f, s) -> 
             Printf.printf "("; printEvalRec f; Printf.printf ", "; printEvalRec s; Printf.printf ")"
     |   _ -> ();;
@@ -197,6 +207,13 @@ let test12 = Let("x", Ncte(10), Binop(Sum, Var("x"), Var("x"))) (* let x = 10 in
 let test13 = App(Lam("x", Var("x")), Ncte(10)) (* "identity" (fn x => x)(10) *)
 let test14 = App(Lam("x", Binop(Sum, Var("x"), Ncte(10))), Ncte(10)) (* (fn x => x + 10)(10) *)
 let test15 = Let("sum_10", Lam("x", Binop(Sum, Var("x"), Ncte(10))), App(Var("sum_10"), Ncte(10))) (* let sum_10 = fn x => x + 10 in sum_10(10) *)
+let test16 = Lrec("fat", "x", If(Binop(Le, Var("x"), Ncte(0)), Ncte(1), Binop(Mult, Var("x"), App(Var("fat"), Binop(Sub, Var("x"), Ncte(1))))), App(Var("fat"), Ncte(5))) 
+                    (* let rec fat = fn x => if x = 0 then 1 else x * fat(x - 1) in fat(5) *)
+
+let test17 = Lrec("sumdown", "x",
+                    If(Binop(Eq, Var("x"), Ncte(0)), Ncte(0), Binop(Sum, Var("x"),   App(Var("sumdown"),   Binop(Sub, Var("x"), Ncte(1))  )      ) ),
+                    
+                    App(Var("sumdown"), Ncte(5))) (* let rec sumdown x = if x = 0 then 0 else x + sumdown(x - 1) in sumdown 5;; *)
 
 let v00 = eval [] test00;;
 let v01 = eval [] test01;;
@@ -214,6 +231,8 @@ let v12 = eval [] test12;;
 let v13 = eval [] test13;;
 let v14 = eval [] test14;;
 let v15 = eval [] test15;;
+let v16 = eval [] test16;;
+let v17 = eval [] test17;;
 
 printEval v00;;
 printEval v01;;
@@ -231,3 +250,5 @@ printEval v12;;
 printEval v13;;
 printEval v14;;
 printEval v15;;
+printEval v16;;
+printEval v17;;
