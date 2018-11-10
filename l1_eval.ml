@@ -172,8 +172,7 @@ let rec eval envi e =
             |   RRaise -> eval envi e2
             |   _ -> v1
         )
-    |   Raise -> RRaise
-    | _ -> raise NoRuleApplies;;
+    |   Raise -> RRaise;;
             
 (* PRINT FINAL VALUE *)
 let rec printEnvironment envi = 
@@ -211,8 +210,7 @@ and printEvalRec v =
             Printf.printf "]> }" 
     |   Vpair(f, s) -> 
             Printf.printf "("; printEvalRec f; Printf.printf ", "; printEvalRec s; Printf.printf ")"
-    |   RRaise -> Printf.printf "RRaise"
-    |   _ -> ();;
+    |   RRaise -> Printf.printf "RRaise";;
 
 
 
