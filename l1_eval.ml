@@ -55,6 +55,7 @@ exception ExecutionError;;
 exception NoValueFound;;
 exception NoValidValue;;
 exception NoValidOperation;;
+exception NoValidList;;
 
 let rec findValueInEnv envi varName = 
     match envi with
@@ -117,7 +118,6 @@ let rec eval envi e =
                     |   (Le, Vnum(n1), Vnum(n2)) -> Vbool(n1 <= n2)
                     |   (Gt, Vnum(n1), Vnum(n2)) -> Vbool(n1 > n2)
                     |   (Ge, Vnum(n1), Vnum(n2)) -> Vbool(n1 >= n2)
-                    (*|   (_, _, _) -> Vbool(false) *)
                     |   _ -> raise NoValidOperation
         )
     |   Lam(varName, e) -> Vclos(varName, e, envi)
@@ -127,19 +127,43 @@ let rec eval envi e =
                 eval ((varName, varValue)::envi) e2
         )
     |   Lrec(f, x, e1, e2) -> eval ((f, Vrclos(f, x, e1, envi))::envi) e2
+    |   App(e1, e2) ->
+    (
+        let closure = eval envi e1 in
+        let v' = eval envi e2 in
+        match closure with
+        |   Vclos(x, e, envi') -> eval ((x, v')::envi') e
+        |   Vrclos(f, x, e, envi') -> eval ((x, v')::(f, closure)::envi') e
+        |   _ -> raise NoRuleApplies
+    )
     |   Cons(valueType, consTail) -> 
         (
             let v = eval envi valueType in
                 Vcons(v, (eval envi consTail))
         )
-    |   App(e1, e2) ->
+    |   IsEmpty(e) ->
         (
-            let closure = eval envi e1 in
-            let v' = eval envi e2 in
-            match closure with
-            |   Vclos(x, e, envi') -> eval ((x, v')::envi') e
-            |   Vrclos(f, x, e, envi') -> eval ((x, v')::(f, closure)::envi') e
-            |   _ -> raise NoRuleApplies
+            let v = eval envi e in
+            match v with
+            |   Vnil -> Vbool(true)
+            |   Vcons(h, _) -> Vbool(false)
+            |   _ -> raise NoValidList
+        )
+    |   Hd(e) ->
+        (
+            let v = eval envi e in
+            match v with
+            |   Vcons(h, _) -> h
+            |   Vnil -> RRaise
+            |   _ -> raise NoValidList
+        )
+    |   Tl(e) ->
+        (
+            let v = eval envi e in
+            match v with
+            |   Vcons(_, t) -> t
+            |   Vnil -> RRaise
+            |   _ -> raise NoValidList
         )
     |   Raise -> RRaise
     | _ -> raise NoRuleApplies;;
@@ -180,6 +204,7 @@ and printEvalRec v =
             Printf.printf "]> }" 
     |   Vpair(f, s) -> 
             Printf.printf "("; printEvalRec f; Printf.printf ", "; printEvalRec s; Printf.printf ")"
+    |   RRaise -> Printf.printf "RRaise"
     |   _ -> ();;
 
 
@@ -215,6 +240,16 @@ let test17 = Lrec("sumdown", "x",
                     
                     App(Var("sumdown"), Ncte(5))) (* let rec sumdown x = if x = 0 then 0 else x + sumdown(x - 1) in sumdown 5;; *)
 
+let test18 = IsEmpty(Nil) (* IsEmpty [] *)
+let test19 = IsEmpty( Cons(Ncte(1), Cons(Ncte(2), Nil))) (* IsEmpty [1; 2] *)
+let test20 = IsEmpty( Cons(Ncte(1), Nil)) (* IsEmpty [1] *)
+let test21 = Hd( Cons(Ncte(1), Nil) ) (* Hd [1] *)
+let test22 = Hd( Cons(Ncte(1), Cons(Ncte(2), Nil))) (* Hd [1; 2] *)
+let test23 = Hd( Nil ) (* Hd Nil *)
+let test24 = Tl( Cons(Ncte(1), Cons(Ncte(2), Nil)) ) (* Tl [1; 2] *)
+let test25 = Tl( Cons(Ncte(1), Nil) ) (* Tl [1] *)
+let test26 = Tl( Nil ) (* Tl Nil *)
+
 let v00 = eval [] test00;;
 let v01 = eval [] test01;;
 let v02 = eval [] test02;;
@@ -233,6 +268,15 @@ let v14 = eval [] test14;;
 let v15 = eval [] test15;;
 let v16 = eval [] test16;;
 let v17 = eval [] test17;;
+let v18 = eval [] test18;;
+let v19 = eval [] test19;;
+let v20 = eval [] test20;;
+let v21 = eval [] test21;;
+let v22 = eval [] test22;;
+let v23 = eval [] test23;;
+let v24 = eval [] test24;;
+let v25 = eval [] test25;;
+let v26 = eval [] test26;;
 
 printEval v00;;
 printEval v01;;
@@ -252,3 +296,12 @@ printEval v14;;
 printEval v15;;
 printEval v16;;
 printEval v17;;
+printEval v18;;
+printEval v19;;
+printEval v20;;
+printEval v21;;
+printEval v22;;
+printEval v23;;
+printEval v24;;
+printEval v25;;
+printEval v26;;
