@@ -1,55 +1,9 @@
-type variable = string;;
+(* #use "right_typeinfer.ml";; 
 
-(* Outros operadores binário e unários podem ser adicionados a linguagem *)
-type bop = 
-        Sum   (* + *)
-    |   Sub   (* - *)
-    |   Mult  (* x *)
-    |   Div   (* / *)
-    |   And   (* and *)
-    |   Or    (* or *)
-    |   Eq    (* = *)
-    |   Df    (* <> *)
-    |   Lt    (*  < *)
-    |   Le    (* <= *)
-    |   Gt    (* > *)
-    |   Ge    (* >= *);;
-     
-type uop = Not;;
+#use "unify.ml";;
+*)
 
-type expr = 
-        Ncte of int 
-    |   Bcte of bool
-    |   Binop of bop * expr * expr
-    |   Unop of uop * expr
-    |   Pair of expr * expr  
-    |   First of expr
-    |   Second of expr
-    |   If of expr * expr * expr 
-    |   Var of variable 
-    |   App of expr * expr      (* "apply" e1(e2) *)
-    |   Lam of variable * expr (* Function "lambda" *)
-    |   Let of variable * expr * expr
-    |   Lrec of variable *  variable * expr * expr
-    |   Nil
-    |   Cons of expr * expr  (* List Contructor *)
-    |   IsEmpty of expr
-    |   Hd of expr
-    |   Tl of expr
-    |   Raise
-    |   Try of expr * expr;;
-        
-type result =
-        Vnum of int 
-    |   Vbool of bool 
-    |   Vpair of result * result
-    |   Vnil
-    |   Vcons of result * result                    (* List contructor value *)
-    |   Vclos of variable * expr * env              (* Closure *)
-    |   Vrclos of variable * variable * expr * env (* RECURSIVE closure*)
-    |   RRaise
-and
-    env = (variable * result) list;;
+#use "type_names.ml";;
 
 (* Excecao a ser ativada quando termo for uma FORMA NORMAL *)
 exception NoRuleApplies;;
@@ -284,6 +238,10 @@ let test29 = Lrec("fat", "x", If(Binop(Le, Var("x"), Ncte(0)), Ncte(1), Binop(Mu
 *)
 let test30 = First(Pair(Ncte(10), Bcte(false)))
 let test31 = Second(Pair(Ncte(10), Bcte(false)))
+let test32 = Let("square", Lam("x", 
+                    Binop(Mult, Var("x"), Var("x"))
+                ), 
+                App(Var("square"), Var("y")))
 
 let v00 = eval [] test00;;
 let v01 = eval [] test01;;
@@ -317,6 +275,7 @@ let v28 = eval [] test28;;
 let v29 = eval [("y", Vnum(5))] test29;;
 let v30 = eval [] test30;;
 let v31 = eval [] test31;;
+let v32 = eval [("y", Vnum(5))] test32;;
 
 printEval v00;;
 printEval v01;;
@@ -350,3 +309,4 @@ printEval v28;;
 printEvalWithLabel "fatorial access y from environment" v29;;
 printEvalWithLabel "first from (10, false)" v30;;
 printEvalWithLabel "second from (10, false)" v31;;
+printEvalWithLabel "let square = fn x => x * x" v32;;
