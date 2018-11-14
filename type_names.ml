@@ -62,12 +62,3 @@ and
 	tenv = (variable * typename) list;;
 
 type clist = (typename * typename) list;;
-
-
-let nextTypeVar x =
-	"X" ^ string_of_int(x)
-;;
-
-Printf.printf "%s\n" (nextTypeVar 1);;
-Printf.printf "%s\n" (nextTypeVar 2);;
-Printf.printf "%s\n" (nextTypeVar 3);;
