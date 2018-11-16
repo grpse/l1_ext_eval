@@ -106,9 +106,8 @@ let rec printTypeEquationsTail typeEquations =
 			printTypeEquationsTail t;
 		)		
 	|	[] -> Printf.printf "[]"
-;;
-
-let rec printTypeEquations tequ = 
+	
+and printTypeEquations tequ = 
 	match tequ with
 	|	(t, equations) ->
 		(
