@@ -1,4 +1,4 @@
-type variable = string;;
+type variable = string
 
 (* Outros operadores binário e unários podem ser adicionados a linguagem *)
 type bop = 
@@ -13,9 +13,9 @@ type bop =
     |   Lt    (*  < *)
     |   Le    (* <= *)
     |   Gt    (* > *)
-    |   Ge    (* >= *);;
-     
-type uop = Not;;
+    |   Ge    (* >= *)
+    
+type uop = Not
 
 type expr = 
         Ncte of int 
@@ -37,7 +37,7 @@ type expr =
     |   Hd of expr
     |   Tl of expr
     |   Raise
-    |   Try of expr * expr;;
+    |   Try of expr * expr
         
 type result =
         Vnum of int 
@@ -49,7 +49,7 @@ type result =
     |   Vrclos of variable * variable * expr * env (* RECURSIVE closure*)
     |   RRaise
 and
-    env = (variable * result) list;;
+    env = (variable * result) list
 
 type typename =
     |   Tx of variable
@@ -57,8 +57,13 @@ type typename =
     |   Tbool
     |   Tpair of typename * typename
     |   Tfn of typename * typename
-	|   Tlist of typename
+    |   Tlist of typename
 and
-	tenv = (variable * typename) list;;
+    tenv = (variable * typename) list
 
-type clist = (typename * typename) list;;
+type clist = (typename * typename) list
+
+exception NoCollectableType
+exception NoValidBinaryOperation
+exception NotDeclaredIdentifier of string
+exception NoValidExpression
