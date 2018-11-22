@@ -1,40 +1,20 @@
+OC_FLAGS = -I tests/
+SOURCES = typenames.ml collect.ml eval.ml main.ml
 
-#
-# Pure OCaml, no packages, no _tags
-#
-
-# bin-annot is required for Merlin and other IDE-like tools
-
-#.PHONY:	all clean byte native profile debug test
-
-OCB_FLAGS = -tag bin_annot -verbose 2
-OCB = 		ocamlbuild $(OCB_FLAGS)
-
-all: native byte # profile debug
+build_dir:
+	mkdir -p _build
 
 clean:
-	$(OCB) -clean
+	sh sanitize.sh
 
-native:
-	$(OCB) main.native
+compile_test_collect:
+	ocamlc $(OC_FLAGS) -o _build/test_collect $(SOURCES) tests/testexpressions.ml tests/test_collect.ml
 
-byte:
-	$(OCB) main.byte
+compile_test_eval:
+	ocamlc $(OC_FLAGS) -o _build/test_eval $(SOURCES) tests/testexpressions.ml tests/test_eval.ml
 
-profile:
-	$(OCB) -tag profile main.native
+test_collect: build_dir compile_test_collect clean
+	./_build/test_collect
 
-debug:
-	$(OCB) -tag debug main.byte
-
-only_test_collect:
-	$(OCB) -tag debug tests/test_collect.native
-
-only_test_eval:
-	$(OCB) -tag debug tests/test_eval.native
-
-test_collect: only_test_collect
-	./tests/test_collect.native
-
-test_eval: only_test_eval
-	./tests/test_eval.native
+test_eval: build_dir compile_test_eval clean
+	./_build/test_eval

@@ -1,1 +1,6 @@
 _build/**
+*.cmi
+*.cmo
+*.cmt
+*.o
+*.cmx

@@ -1,0 +1,15 @@
+rm -f *.cmi
+rm -f *.cmo
+rm -f *.cmt
+rm -f *.o
+rm -f *.cmx
+rm -f tests/*.cmi
+rm -f tests/*.cmo
+rm -f tests/*.cmt
+rm -f tests/*.o
+rm -f tests/*.cmx
+rm -f _build/*.cmi
+rm -f _build/*.cmo
+rm -f _build/*.cmt
+rm -f _build/*.o
+rm -f _build/*.cmx
