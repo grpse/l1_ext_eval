@@ -67,3 +67,4 @@ exception NoCollectableType
 exception NoValidBinaryOperation
 exception NotDeclaredIdentifier of string
 exception NoValidExpression
+exception SyntaxError (* of string *)

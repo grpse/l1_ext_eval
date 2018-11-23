@@ -1,5 +1,5 @@
 open Typenames
- 
+
 exception SyntaxError (* of string *)
 
 (* Procura a ocorrencia de X em T*)
