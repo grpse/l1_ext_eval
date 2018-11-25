@@ -34,7 +34,7 @@ let test23 = Hd( Nil ) (* Hd Nil *)
 let test24 = Tl( Cons(Ncte(1), Cons(Ncte(2), Nil)) ) (* Tl [1; 2] *)
 let test25 = Tl( Cons(Ncte(1), Nil) ) (* Tl [1] *)
 let test26 = Tl( Nil ) (* Tl Nil *)
-let test27 = Try( Ncte(10), Nil) (* "BAD TYPE" try 10 with Nil *)
+let test27 = Try( Ncte(10), Ncte(1)) (* try 10 with 1 *)
 let test28 = Try( Tl(Nil), Cons(Ncte(10), Nil) ) (* "this will raise a condition" try Tl [] with [10] >>>>>>>>>>>>> WELL TYPED <<<<<<<<<<< *)
 let test29 = Lrec("fat", "x", If(Binop(Le, Var("x"), Ncte(0)), Ncte(1), Binop(Mult, Var("x"), App(Var("fat"), Binop(Sub, Var("x"), Ncte(1))))), App(Var("fat"), Var("y")))
 (*  

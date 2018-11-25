@@ -1,6 +1,7 @@
 open Testexpressions
 open Collect
 open Typenames
+open Util
 
 let v00 = collect [] test00;;
 let v01 = collect [] test01;;

@@ -3,7 +3,7 @@ open Collect
 open Typenames
 open Unify
 open Applysubs
-
+open Util
 
 let (a00, v00) = collect [] test00;;
 let s00 = unify [] v00;;
@@ -29,6 +29,7 @@ let (a05, v05) = collect [("y", Tbool)] test05;;
 let s05 = unify [] v05;;
 let as05 = applysubs s05 a05;;
 
+(*
 let (a06, v06) = collect [("x", Tint)] test06;;
 let s06 = unify [] v06;;
 let as06 = applysubs s06 a06;;
@@ -129,35 +130,36 @@ let (a30, v30) = collect [("y", Tint)] test30;;
 let s30 = unify [] v30;;
 let as30 = applysubs s30 a30;;
 
-printEquations as00;;
-printEquations as01;;
-printEquations as02;;
-printEquations as03;;
-printEquations as04;;
-printEquations as05;;
-printEquations as06;;
-printEquations as07;;
-printEquations as08;;
-printEquations as09;;
-printEquations as10;;
-printEquations as11;;
-printEquations as12;;
-printEquations as13;;
-printEquations as14;;
-printEquations as15;;
-printEquations as16;;
-printEquations as17;;
-printEquations as18;;
-printEquations as19;;
-printEquations as20;;
-printEquations as21;;
-printEquations as22;;
-printEquations as23;;
-printEquations as24;;
-printEquations as25;;
-printEquations as26;;
-printEquations as27;;
-printEquations as28;;
-printEquations as29;;
-printEquations as30;;
+printEquations (as00, []);;
+printEquations (as01, []);;
+printEquations (as02, []);;
+printEquations (as03, []);;
+printEquations (as04, []);;
+printEquations (as05, []);;
+printEquations (as06, []);;
+printEquations (as07, []);;
+printEquations (as08, []);;
+printEquations (as09, []);;
+printEquations (as10, []);;
+printEquations (as11, []);;
+printEquations (as12, []);;
+printEquations (as13, []);;
+printEquations (as14, []);;
+printEquations (as15, []);;
+printEquations (as16, []);;
+printEquations (as17, []);;
+printEquations (as18, []);;
+printEquations (as19, []);;
+printEquations (as20, []);;
+printEquations (as21, []);;
+printEquations (as22, []);;
+printEquations (as23, []);;
+printEquations (as24, []);;
+printEquations (as25, []);;
+printEquations (as26, []);;
+printEquations (as27, []);;
+printEquations (as28, []);;
+printEquations (as29, []);;
+printEquations (as30, []);;
 
+*)

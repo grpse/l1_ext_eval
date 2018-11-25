@@ -2,7 +2,7 @@ open Testexpressions
 open Collect
 open Typenames
 open Unify
-
+open Util
 
 let (a00, v00) = collect [] test00;;
 let s00 = unify [] v00;;
@@ -36,7 +36,6 @@ let s09 = unify [] v09;;
 
 let (a10, v10) = collect [] test10;;
 let s10 = unify [] v10;;
-
 let (a11, v11) = collect [] test11;;
 let s11 = unify [] v11;;
 
@@ -65,7 +64,7 @@ let (a19, v19) = collect [] test19;;
 let s19 = unify [] v19;;
 
 let (a20, v20) = collect [] test20;;
-let s2 = unify [] v20;;
+let s20 = unify [] v20;;
 
 let (a21, v21) = collect [] test21;;
 let s21 = unify [] v21;;
@@ -97,34 +96,34 @@ let s29 = unify [] v29;;
 let (a30, v30) = collect [("y", Tint)] test30;;
 let s30 = unify [] v30;;
 
-printEquations s00;;
-printEquations s01;;
-printEquations s02;;
-printEquations s03;;
-printEquations s04;;
-printEquations s05;;
-printEquations s06;;
-printEquations s07;;
-printEquations s08;;
-printEquations s09;;
-printEquations s10;;
-printEquations s11;;
-printEquations s12;;
-printEquations s13;;
-printEquations s14;;
-printEquations s15;;
-printEquations s16;;
-printEquations s17;;
-printEquations s18;;
-printEquations s19;;
-printEquations s20;;
-printEquations s21;;
-printEquations s22;;
-printEquations s23;;
-printEquations s24;;
-printEquations s25;;
-printEquations s26;;
-printEquations s27;;
-printEquations s28;;
-printEquations s29;;
-printEquations s30;;
+printEquations (a00, s00);;
+printEquations (a01, s01);;
+printEquations (a02, s02);;
+printEquations (a03, s03);;
+printEquations (a04, s04);;
+printEquations (a05, s05);;
+printEquations (a06, s06);;
+printEquations (a07, s07);;
+printEquations (a08, s08);;
+printEquations (a09, s09);;
+printEquations (a10, s10);;
+printEquations (a11, s11);;
+printEquations (a12, s12);;
+printEquations (a13, s13);;
+printEquations (a14, s14);;
+printEquations (a15, s15);;
+printEquations (a16, s16);;
+printEquations (a17, s17);;
+printEquations (a18, s18);;
+printEquations (a19, s19);;
+printEquations (a20, s20);;
+printEquations (a21, s21);;
+printEquations (a22, s22);;
+printEquations (a23, s23);;
+printEquations (a24, s24);;
+printEquations (a25, s25);;
+printEquations (a26, s26);;
+printEquations (a27, s27);;
+printEquations (a28, s28);;
+printEquations (a29, s29);;
+printEquations (a30, s30);;
