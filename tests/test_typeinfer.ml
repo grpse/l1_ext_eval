@@ -4,6 +4,7 @@ open Typenames
 open Unify
 open Applysubs
 open Typeinfer
+open Util
 
 let ty00 = typeinfer [] test00;;
 let ty01 = typeinfer [] test01;;
