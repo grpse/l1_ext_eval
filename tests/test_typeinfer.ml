@@ -8,7 +8,6 @@ open Typeinfer
 let ty00 = typeinfer [] test00;;
 let ty01 = typeinfer [] test01;;
 let ty02 = typeinfer [] test02;;
-
 let ty03 = typeinfer [] test03;;
 let ty04 = typeinfer [] test04;;
 let ty05 = typeinfer [("y", Tbool)] test05;;
