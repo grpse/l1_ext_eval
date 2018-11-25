@@ -25,11 +25,11 @@ let (a04, v04) = collect [] test04;;
 let s04 = unify [] v04;;
 let as04 = applysubs s04 a04;;
 
-let (a05, v05) = collect [("y", Tbool)] test05;;
+let (a05, v05) = collect [] test05;;
 let s05 = unify [] v05;;
+(* (X -> int, [int]) *)
 let as05 = applysubs s05 a05;;
 
-(*
 let (a06, v06) = collect [("x", Tint)] test06;;
 let s06 = unify [] v06;;
 let as06 = applysubs s06 a06;;
@@ -58,6 +58,7 @@ let (a12, v12) = collect [] test12;;
 let s12 = unify [] v12;;
 let as12 = applysubs s12 a12;;
 
+(* This expression have some problem *)
 let (a13, v13) = collect [] test13;;
 let s13 = unify [] v13;;
 let as13 = applysubs s13 a13;;
@@ -130,36 +131,34 @@ let (a30, v30) = collect [("y", Tint)] test30;;
 let s30 = unify [] v30;;
 let as30 = applysubs s30 a30;;
 
-printEquations (as00, []);;
-printEquations (as01, []);;
-printEquations (as02, []);;
-printEquations (as03, []);;
-printEquations (as04, []);;
-printEquations (as05, []);;
-printEquations (as06, []);;
-printEquations (as07, []);;
-printEquations (as08, []);;
-printEquations (as09, []);;
-printEquations (as10, []);;
-printEquations (as11, []);;
-printEquations (as12, []);;
-printEquations (as13, []);;
-printEquations (as14, []);;
-printEquations (as15, []);;
-printEquations (as16, []);;
-printEquations (as17, []);;
-printEquations (as18, []);;
-printEquations (as19, []);;
-printEquations (as20, []);;
-printEquations (as21, []);;
-printEquations (as22, []);;
-printEquations (as23, []);;
-printEquations (as24, []);;
-printEquations (as25, []);;
-printEquations (as26, []);;
-printEquations (as27, []);;
-printEquations (as28, []);;
-printEquations (as29, []);;
-printEquations (as30, []);;
-
-*)
+printEquations (as00, s00);;
+printEquations (as01, s01);;
+printEquations (as02, s02);;
+printEquations (as03, s03);;
+printEquations (as04, s04);;
+printEquations (as05, s05);;
+printEquations (as06, s06);;
+printEquations (as07, s07);;
+printEquations (as08, s08);;
+printEquations (as09, s09);;
+printEquations (as10, s10);;
+printEquations (as11, s11);;
+printEquations (as12, s12);;
+printEquations (as13, s13);;
+printEquations (as14, s14);;
+printEquations (as15, s15);;
+printEquations (as16, s16);;
+printEquations (as17, s17);;
+printEquations (as18, s18);;
+printEquations (as19, s19);;
+printEquations (as20, s20);;
+printEquations (as21, s21);;
+printEquations (as22, s22);;
+printEquations (as23, s23);;
+printEquations (as24, s24);;
+printEquations (as25, s25);;
+printEquations (as26, s26);;
+printEquations (as27, s27);;
+printEquations (as28, s28);;
+printEquations (as29, s29);;
+printEquations (as30, s30);;
