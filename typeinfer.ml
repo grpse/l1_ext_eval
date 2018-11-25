@@ -4,7 +4,7 @@ open Collect
 open Applysubs
 
 
-let typeinfer env P =
-	let (T, C) = collect env P in
-	let subs = unify [] C in
-	applysubs subs T
+let typeinfer env p =
+	let (t, c) = collect env p in
+	let subs = unify [] c in
+	applysubs subs t
