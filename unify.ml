@@ -27,4 +27,3 @@ let rec unify (subs : clist) (c : clist) : clist =
           then unify (subs @ [(Tx(x), t)]) restC
         else raise SyntaxError; (* evitar circularidade *)
     | (_, _) :: restC -> printTypeEquationsTail c; raise SyntaxError
-    | _ -> raise SyntaxError

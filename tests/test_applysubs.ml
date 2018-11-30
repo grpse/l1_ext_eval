@@ -25,9 +25,8 @@ let (a04, v04) = collect [] test04;;
 let s04 = unify [] v04;;
 let as04 = applysubs s04 a04;;
 
-let (a05, v05) = collect [] test05;;
+let (a05, v05) = collect [("x", Tint)] test05;;
 let s05 = unify [] v05;;
-(* (X -> int, [int]) *)
 let as05 = applysubs s05 a05;;
 
 let (a06, v06) = collect [("x", Tint)] test06;;
@@ -131,6 +130,10 @@ let (a30, v30) = collect [("y", Tint)] test30;;
 let s30 = unify [] v30;;
 let as30 = applysubs s30 a30;;
 
+let (a31, v31) = collect [("y", Tint)] test31;;
+let s31 = unify [] v31;;
+let as31 = applysubs s31 a31;;
+
 printEquations (as00, s00);;
 printEquations (as01, s01);;
 printEquations (as02, s02);;
@@ -162,3 +165,4 @@ printEquations (as27, s27);;
 printEquations (as28, s28);;
 printEquations (as29, s29);;
 printEquations (as30, s30);;
+printEquations (as31, s31);;

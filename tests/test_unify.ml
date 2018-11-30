@@ -19,7 +19,7 @@ let s03 = unify [] v03;;
 let (a04, v04) = collect [] test04;;
 let s04 = unify [] v04;;
 
-let (a05, v05) = collect [("y", Tbool)] test05;;
+let (a05, v05) = collect [("x", Tint)] test05;;
 let s05 = unify [] v05;;
 
 let (a06, v06) = collect [("x", Tint)] test06;;
@@ -96,6 +96,9 @@ let s29 = unify [] v29;;
 let (a30, v30) = collect [("y", Tint)] test30;;
 let s30 = unify [] v30;;
 
+let (a31, v31) = collect [("y", Tint)] test31;;
+let s31 = unify [] v31;;
+
 printEquations (a00, s00);;
 printEquations (a01, s01);;
 printEquations (a02, s02);;
@@ -127,3 +130,4 @@ printEquations (a27, s27);;
 printEquations (a28, s28);;
 printEquations (a29, s29);;
 printEquations (a30, s30);;
+printEquations (a31, s31);;

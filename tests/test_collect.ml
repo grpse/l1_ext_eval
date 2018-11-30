@@ -6,10 +6,9 @@ open Util
 let v00 = collect [] test00;;
 let v01 = collect [] test01;;
 let v02 = collect [] test02;;
-
 let v03 = collect [] test03;;
 let v04 = collect [] test04;;
-let v05 = collect [("y", Tbool)] test05;;
+let v05 = collect [("x", Tint)] test05;;
 let v06 = collect [("x", Tint)] test06;;
 let v07 = collect [("x", Tint)] test07;;
 let v08 = collect [] test08;;
@@ -35,6 +34,7 @@ let v27 = collect [] test27;;
 let v28 = collect [] test28;;
 let v29 = collect [("y", Tint)] test29;;
 let v30 = collect [("y", Tint)] test30;;
+let v31 = collect [("x", Tint)] test31;;
 
 printEquations v00;;
 printEquations v01;;
@@ -67,3 +67,4 @@ printEquations v27;;
 printEquations v28;;
 printEquations v29;;
 printEquations v30;;
+printEquations v31;;

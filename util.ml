@@ -38,8 +38,8 @@ and printTypeEquations tequ =
 let equationCounter = ref 0;;
 
 let rec printEquations typeEquations = 
-	equationCounter := !equationCounter + 1;
 	Printf.printf "Equation %d: " !equationCounter;
+	equationCounter := !equationCounter + 1;
   printTypeEquations typeEquations;
   Printf.printf "\n";
   

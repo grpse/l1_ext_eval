@@ -36,8 +36,9 @@ let rec lookupForType (subs : clist) var =
 						)
 						
 				)
-	)
-|	_ -> raise (NotDeclaredIdentifier var)
+			|	_ -> raise SyntaxError
+		)
+|	_ -> Tx(var)
 
 
 let rec applysubs (subs : clist) t =
